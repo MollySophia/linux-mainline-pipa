@@ -224,8 +224,8 @@ static __cpuidle int intel_idle_hlt(struct cpuidle_device *dev,
 	return __intel_idle_hlt(dev, drv, index);
 }
 
-static __cpuidle int intel_idle_hlt_irq_on(struct cpuidle_device *dev,
-                                   struct cpuidle_driver *drv, int index)
+static __cpuidle int intel_idle_hlt_irq(struct cpuidle_device *dev,
+					struct cpuidle_driver *drv, int index)
 {
        int ret;
 
@@ -1900,11 +1900,11 @@ static void state_update_enter_method(struct cpuidle_state *state, int cstate)
 	if (state->enter == intel_idle_hlt) {
 		if (force_irq_on) {
 			pr_info("forced intel_idle_irq for state %d\n", cstate);
-			state->enter = intel_idle_hlt_irq_on;
+			state->enter = intel_idle_hlt_irq;
 		}
 		return;
 	}
-	if (state->enter == intel_idle_hlt_irq_on)
+	if (state->enter == intel_idle_hlt_irq)
 		return; /* no update scenarios */
 
 	if (state->flags & CPUIDLE_FLAG_INIT_XSTATE) {
@@ -1949,7 +1949,7 @@ static bool should_verify_mwait(struct cpuidle_state *state)
 {
 	if (state->enter == intel_idle_hlt)
 		return false;
-	if (state->enter == intel_idle_hlt_irq_on)
+	if (state->enter == intel_idle_hlt_irq)
 		return false;
 
 	return true;
