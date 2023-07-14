@@ -299,7 +299,7 @@ static ssize_t svc_tcp_read_msg(struct svc_rqst *rqstp, size_t buflen,
 {
 	struct svc_sock *svsk =
 		container_of(rqstp->rq_xprt, struct svc_sock, sk_xprt);
-	struct bio_vec *bvec = rqstp->rq_bvec;
+	struct bio_vec *bvec = svsk->sk_recv_bvec;
 	struct msghdr msg = { NULL };
 	unsigned int i;
 	ssize_t len;
