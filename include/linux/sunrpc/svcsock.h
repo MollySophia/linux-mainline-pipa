@@ -40,6 +40,9 @@ struct svc_sock {
 
 	struct completion	sk_handshake_done;
 
+	struct bio_vec		sk_send_bvec[RPCSVC_MAXPAGES]
+						____cacheline_aligned;
+
 	struct page *		sk_pages[RPCSVC_MAXPAGES];	/* received data */
 };
 
