@@ -260,8 +260,7 @@ static inline void seq_show_option(struct seq_file *m, const char *name,
  */
 #define seq_show_option_n(m, name, value, length) {	\
 	char val_buf[length + 1];			\
-	strncpy(val_buf, value, length);		\
-	val_buf[length] = '\0';				\
+	strscpy(val_buf, value, sizeof(val_buf));	\
 	seq_show_option(m, name, val_buf);		\
 }
 
