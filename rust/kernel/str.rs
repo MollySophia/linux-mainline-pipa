@@ -213,6 +213,7 @@ impl fmt::Display for CStr {
     ///
     /// ```
     /// # use kernel::c_str;
+    /// # use kernel::fmt;
     /// # use kernel::str::CStr;
     /// # use kernel::str::CString;
     /// let penguin = c_str!("🐧");
