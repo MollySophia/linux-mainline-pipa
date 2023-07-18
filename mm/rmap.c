@@ -986,9 +986,9 @@ static int page_vma_mkclean_one(struct page_vma_mapped_walk *pvmw)
 		}
 
 		/*
-		 * No need to call mmu_notifier_invalidate_range() as we are
-		 * downgrading page table protection not changing it to point
-		 * to a new page.
+		 * No need to call mmu_notifier_arch_invalidate_secondary_tlbs() as
+		 * we are downgrading page table protection not changing it to
+		 * point to a new page.
 		 *
 		 * See Documentation/mm/mmu_notifier.rst
 		 */
@@ -1549,8 +1549,8 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
 					hugetlb_vma_unlock_write(vma);
 					flush_tlb_range(vma,
 						range.start, range.end);
-					mmu_notifier_invalidate_range(mm,
-						range.start, range.end);
+					mmu_notifier_arch_invalidate_secondary_tlbs(
+						mm, range.start, range.end);
 					/*
 					 * The ref count of the PMD page was
 					 * dropped which is part of the way map
@@ -1624,7 +1624,7 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
 			 */
 			dec_mm_counter(mm, mm_counter(&folio->page));
 			/* We have to invalidate as we cleared the pte */
-			mmu_notifier_invalidate_range(mm, address,
+			mmu_notifier_arch_invalidate_secondary_tlbs(mm, address,
 						      address + PAGE_SIZE);
 		} else if (folio_test_anon(folio)) {
 			swp_entry_t entry = { .val = page_private(subpage) };
@@ -1638,7 +1638,8 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
 				WARN_ON_ONCE(1);
 				ret = false;
 				/* We have to invalidate as we cleared the pte */
-				mmu_notifier_invalidate_range(mm, address,
+				mmu_notifier_arch_invalidate_secondary_tlbs(mm,
+							address,
 							address + PAGE_SIZE);
 				page_vma_mapped_walk_done(&pvmw);
 				break;
@@ -1671,8 +1672,9 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
 				if (ref_count == 1 + map_count &&
 				    !folio_test_dirty(folio)) {
 					/* Invalidate as we cleared the pte */
-					mmu_notifier_invalidate_range(mm,
-						address, address + PAGE_SIZE);
+					mmu_notifier_arch_invalidate_secondary_tlbs(
+						mm, address,
+						address + PAGE_SIZE);
 					dec_mm_counter(mm, MM_ANONPAGES);
 					goto discard;
 				}
@@ -1728,7 +1730,7 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
 				swp_pte = pte_swp_mkuffd_wp(swp_pte);
 			set_pte_at(mm, address, pvmw.pte, swp_pte);
 			/* Invalidate as we cleared the pte */
-			mmu_notifier_invalidate_range(mm, address,
+			mmu_notifier_arch_invalidate_secondary_tlbs(mm, address,
 						      address + PAGE_SIZE);
 		} else {
 			/*
@@ -1746,9 +1748,9 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
 		}
 discard:
 		/*
-		 * No need to call mmu_notifier_invalidate_range() it has be
-		 * done above for all cases requiring it to happen under page
-		 * table lock before mmu_notifier_invalidate_range_end()
+		 * No need to call mmu_notifier_arch_invalidate_secondary_tlbs() it
+		 * has be done above for all cases requiring it to happen under
+		 * page table lock before mmu_notifier_invalidate_range_end()
 		 *
 		 * See Documentation/mm/mmu_notifier.rst
 		 */
@@ -1930,8 +1932,8 @@ static bool try_to_migrate_one(struct folio *folio, struct vm_area_struct *vma,
 					hugetlb_vma_unlock_write(vma);
 					flush_tlb_range(vma,
 						range.start, range.end);
-					mmu_notifier_invalidate_range(mm,
-						range.start, range.end);
+					mmu_notifier_arch_invalidate_secondary_tlbs(
+						mm, range.start, range.end);
 
 					/*
 					 * The ref count of the PMD page was
@@ -2037,8 +2039,8 @@ static bool try_to_migrate_one(struct folio *folio, struct vm_area_struct *vma,
 			 */
 			dec_mm_counter(mm, mm_counter(&folio->page));
 			/* We have to invalidate as we cleared the pte */
-			mmu_notifier_invalidate_range(mm, address,
-						      address + PAGE_SIZE);
+			mmu_notifier_arch_invalidate_secondary_tlbs(mm, address,
+							address + PAGE_SIZE);
 		} else {
 			swp_entry_t entry;
 			pte_t swp_pte;
@@ -2103,9 +2105,9 @@ static bool try_to_migrate_one(struct folio *folio, struct vm_area_struct *vma,
 		}
 
 		/*
-		 * No need to call mmu_notifier_invalidate_range() it has be
-		 * done above for all cases requiring it to happen under page
-		 * table lock before mmu_notifier_invalidate_range_end()
+		 * No need to call mmu_notifier_arch_invalidate_secondary_tlbs() it
+		 * has be done above for all cases requiring it to happen under
+		 * page table lock before mmu_notifier_invalidate_range_end()
 		 *
 		 * See Documentation/mm/mmu_notifier.rst
 		 */
