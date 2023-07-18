@@ -38,7 +38,14 @@ struct svc_sock {
 	/* Number of queued send requests */
 	atomic_t		sk_sendqlen;
 
+	struct page_frag_cache  sk_frag_cache;
+
 	struct completion	sk_handshake_done;
+
+	struct bio_vec		sk_recv_bvec[RPCSVC_MAXPAGES]
+						____cacheline_aligned;
+	struct bio_vec		sk_send_bvec[RPCSVC_MAXPAGES]
+						____cacheline_aligned;
 
 	struct page *		sk_pages[RPCSVC_MAXPAGES];	/* received data */
 };
