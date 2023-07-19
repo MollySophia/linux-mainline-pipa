@@ -110,7 +110,7 @@ static int avtab_insert(struct avtab *h, const struct avtab_key *key,
 	struct avtab_node *prev, *cur, *newnode;
 	u16 specified = key->specified & ~(AVTAB_ENABLED|AVTAB_ENABLED_OLD);
 
-	if (!h || !h->nslot)
+	if (!h || !h->nslot || h->nel == U32_MAX)
 		return -EINVAL;
 
 	hvalue = avtab_hash(key, h->mask);
@@ -156,7 +156,7 @@ struct avtab_node *avtab_insert_nonunique(struct avtab *h,
 	struct avtab_node *prev, *cur;
 	u16 specified = key->specified & ~(AVTAB_ENABLED|AVTAB_ENABLED_OLD);
 
-	if (!h || !h->nslot)
+	if (!h || !h->nslot || h->nel == U32_MAX)
 		return NULL;
 	hvalue = avtab_hash(key, h->mask);
 	for (prev = NULL, cur = h->htable[hvalue];
@@ -248,7 +248,7 @@ struct avtab_node *avtab_search_node(struct avtab *h,
 }
 
 struct avtab_node*
-avtab_search_node_next(struct avtab_node *node, int specified)
+avtab_search_node_next(struct avtab_node *node, u16 specified)
 {
 	struct avtab_node *cur;
 
