@@ -135,7 +135,7 @@ EXPORT_SYMBOL(system_state);
 void (*__initdata late_time_init)(void);
 
 /* Untouched command line saved by arch-specific code. */
-char __initdata boot_command_line[COMMAND_LINE_SIZE];
+char boot_command_line[COMMAND_LINE_SIZE] __ro_after_init;
 /* Untouched saved command line (eg. for /proc) */
 char *saved_command_line __ro_after_init;
 unsigned int saved_command_line_len __ro_after_init;
@@ -145,6 +145,11 @@ static char *static_command_line;
 static char *extra_command_line;
 /* Extra init arguments */
 static char *extra_init_args;
+
+/* Untouched boot-config string */
+#ifdef CONFIG_BOOT_CONFIG_FORCE
+char saved_bootconfig_string[COMMAND_LINE_SIZE] __ro_after_init;
+#endif
 
 #ifdef CONFIG_BOOT_CONFIG
 /* Is bootconfig on command line? */
@@ -434,6 +439,10 @@ static void __init setup_boot_config(void)
 			pr_info("No bootconfig data provided, so skipping bootconfig");
 		return;
 	}
+
+#ifdef CONFIG_BOOT_CONFIG_FORCE
+	strncpy(saved_bootconfig_string, data, COMMAND_LINE_SIZE);
+#endif
 
 	if (size >= XBC_DATA_MAX) {
 		pr_err("bootconfig size %ld greater than max size %d\n",
