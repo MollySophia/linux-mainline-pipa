@@ -830,24 +830,17 @@ static void comp_irq_release_pci(struct mlx5_core_dev *dev, u16 vecidx)
 
 static int mlx5_cpumask_default_spread(int numa_node, int index)
 {
-	const struct cpumask *prev = cpu_none_mask;
-	const struct cpumask *mask;
 	int found_cpu = 0;
 	int i = 0;
-	int cpu;
+	int cpu, hop;
 
 	rcu_read_lock();
-	for_each_numa_hop_mask(mask, numa_node) {
-		for_each_cpu_andnot(cpu, mask, prev) {
-			if (i++ == index) {
-				found_cpu = cpu;
-				goto spread_done;
-			}
+	for_each_numa_online_cpu(cpu, hop, numa_node) {
+		if (i++ == index) {
+			found_cpu = cpu;
+			break;
 		}
-		prev = mask;
 	}
-
-spread_done:
 	rcu_read_unlock();
 	return found_cpu;
 }
