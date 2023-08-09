@@ -118,11 +118,11 @@ static int __alloc_pbl(struct bnxt_qplib_res *res,
 	else
 		pages = sginfo->npages;
 	/* page ptr arrays */
-	pbl->pg_arr = vmalloc(pages * sizeof(void *));
+	pbl->pg_arr = vmalloc_array(pages, sizeof(void *));
 	if (!pbl->pg_arr)
 		return -ENOMEM;
 
-	pbl->pg_map_arr = vmalloc(pages * sizeof(dma_addr_t));
+	pbl->pg_map_arr = vmalloc_array(pages, sizeof(dma_addr_t));
 	if (!pbl->pg_map_arr) {
 		vfree(pbl->pg_arr);
 		pbl->pg_arr = NULL;
@@ -385,7 +385,7 @@ static int bnxt_qplib_alloc_tqm_rings(struct bnxt_qplib_res *res,
 	struct bnxt_qplib_hwq_attr hwq_attr = {};
 	struct bnxt_qplib_sg_info sginfo = {};
 	struct bnxt_qplib_tqm_ctx *tqmctx;
-	int rc = 0;
+	int rc;
 	int i;
 
 	tqmctx = &ctx->tqm_ctx;
@@ -463,7 +463,7 @@ static void bnxt_qplib_map_tqm_pgtbl(struct bnxt_qplib_tqm_ctx *ctx)
 static int bnxt_qplib_setup_tqm_rings(struct bnxt_qplib_res *res,
 				      struct bnxt_qplib_ctx *ctx)
 {
-	int rc = 0;
+	int rc;
 
 	rc = bnxt_qplib_alloc_tqm_rings(res, ctx);
 	if (rc)
@@ -501,7 +501,7 @@ int bnxt_qplib_alloc_ctx(struct bnxt_qplib_res *res,
 {
 	struct bnxt_qplib_hwq_attr hwq_attr = {};
 	struct bnxt_qplib_sg_info sginfo = {};
-	int rc = 0;
+	int rc;
 
 	if (virt_fn || is_p5)
 		goto stats_alloc;
@@ -876,7 +876,7 @@ int bnxt_qplib_alloc_res(struct bnxt_qplib_res *res, struct pci_dev *pdev,
 			 struct net_device *netdev,
 			 struct bnxt_qplib_dev_attr *dev_attr)
 {
-	int rc = 0;
+	int rc;
 
 	res->pdev = pdev;
 	res->netdev = netdev;
