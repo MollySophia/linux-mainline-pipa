@@ -254,6 +254,7 @@ static void ovl_file_accessed(struct file *file)
 	if (!upperinode)
 		return;
 
+	spin_lock(&inode->i_lock);
 	ctime = inode_get_ctime(inode);
 	uctime = inode_get_ctime(upperinode);
 	if ((!timespec64_equal(&inode->i_mtime, &upperinode->i_mtime) ||
@@ -261,6 +262,7 @@ static void ovl_file_accessed(struct file *file)
 		inode->i_mtime = upperinode->i_mtime;
 		inode_set_ctime_to_ts(inode, uctime);
 	}
+	spin_unlock(&inode->i_lock);
 
 	touch_atime(&file->f_path);
 }
